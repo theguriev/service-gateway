@@ -1,0 +1,529 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Nitro Server Routes",
+      "version": null
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "Local Development Server",
+        "variables": {
+          
+        }
+      }
+    ],
+    "schemes": [
+      "http"
+    ],
+    "components": {
+      "schemas": {
+        "User": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string",
+              "description": "The ID of the user."
+            },
+            "name": {
+              "type": "string",
+              "description": "The name of the user."
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "description": "The email address of the user."
+            },
+            "password": {
+              "type": "string",
+              "description": "The password of the user."
+            },
+            "timestamp": {
+              "type": "integer",
+              "format": "int64",
+              "description": "The timestamp indicating when the user was created or last updated."
+            },
+            "forgotPassword": {
+              "type": "object",
+              "description": "Information related to password reset.",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "The token generated for password reset."
+                },
+                "timestamp": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "The timestamp indicating when the password reset token was generated."
+                }
+              }
+            }
+          },
+          "required": ["_id", "name", "email", "password", "timestamp"]
+        },
+        "RegisterUserRequest": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 20
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "password": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 20
+            },
+            "confirmation": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 20
+            }
+          },
+          "required": ["name", "email", "password", "confirmation"]
+        },
+        "LoginRequest": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "password": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 20
+            }
+          },
+          "required": ["email", "password"]
+        },
+        "LoginResponse": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "format": "email",
+              "description": "The email address of the logged-in user."
+            },
+            "password": {
+              "type": "string",
+              "description": "The hashed password of the logged-in user."
+            }
+          },
+          "required": ["email", "password"]
+        },
+        "ForgotPasswordRequest": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "required": ["email"]
+        },
+        "ForgotPasswordResponse": {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "type": "boolean",
+              "description": "Indicates if the password reset process was initiated successfully."
+            }
+          },
+          "required": ["ok"]
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string",
+              "description": "A message describing the error."
+            },
+            "status": {
+              "type": "integer",
+              "description": "The HTTP status code of the error."
+            }
+          },
+          "required": ["message", "status"]
+        },
+        "ValidationError": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "example": "/forgot-password"
+            },
+            "statusCode": {
+              "type": "integer",
+              "example": 400
+            },
+            "statusMessage": {
+              "type": "string",
+              "example": "Validation Error"
+            },
+            "message": {
+              "type": "string",
+              "example": "Validation Error"
+            },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "example": "invalid_string"
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Invalid email"
+                  },
+                  "path": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "validation": {
+                    "type": "string",
+                    "example": "email"
+                  }
+                },
+                "required": ["path", "code", "message"]
+              }
+            }
+          },
+          "required": ["data", "message", "statusCode"]
+        }
+      }
+    },
+    "paths": {
+      "/forgot-password": {
+        "post": {
+          "summary": "Forgot Password Handler",
+          "description": "Handler to initiate the password reset process for a user.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ForgotPasswordResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "User not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/": {
+        "get": {
+          "summary": "Check if User Exists",
+          "description": "This endpoint checks if a user exists based on the provided access token.",
+          "parameters": [
+            {
+              "name": "accessToken",
+              "in": "cookie",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": "accessToken=your_access_token_here",
+              "description": "Access token cookie"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Me",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Access token not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "409": {
+              "description": "User not exists",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/login": {
+        "post": {
+          "summary": "User Login Handler",
+          "description": "Handler to authenticate and log in a user.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LoginResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Wrong password or email",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/logout": {
+        "get": {
+          "summary": "Cleanup Tokens Handler",
+          "description": "Handler to cleanup tokens associated with an access token.",
+          "parameters": [
+            {
+              "name": "accessToken",
+              "in": "cookie",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": "accessToken=your_access_token_here",
+              "description": "Access token cookie"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            },
+            "404": {
+              "description": "Access token not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/refresh": {
+        "get": {
+          "summary": "Refresh Token Handler",
+          "description": "Handler to refresh user token.",
+          "parameters": [
+            {
+              "name": "refreshToken",
+              "in": "cookie",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": "refreshToken=your_refresh_token_here",
+              "description": "Refresh token cookie"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Refresh token not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/registration": {
+        "post": {
+          "summary": "User Registration Handler",
+          "description": "Handler to register a new user.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterUserRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  }
+                }
+              }
+            },
+            "409": {
+              "description": "User already exists",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/change-name": {
+        "put": {
+          "summary": "Change user name",
+          "parameters": [
+            {
+              "name": "accessToken",
+              "in": "cookie",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": "accessToken=your_access_token_here",
+              "description": "Access token cookie"
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "New name for the user"
+                    }
+                  },
+                  "required": ["name"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "User name changed successfully"
+            },
+            "404": {
+              "description": "Access token not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "description": "Error message"
+                      }
+                    },
+                    "required": ["message"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
