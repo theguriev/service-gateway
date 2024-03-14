@@ -24,4 +24,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: therealguriev/service-authorization:${{ github.sha }}
+          tags: therealguriev/service-gateway:${{ github.sha }}
