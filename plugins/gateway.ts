@@ -38,7 +38,7 @@ export default defineNitroPlugin((app) => {
         }), method)
       }
     })
-    console.log('Nitro plugin!', routes, issueAccessToken({ id: '123', role: 'admin' }, { secret }))
+    console.log('Nitro plugin!')
   } catch (error) {
     console.error('Initialize error: ', error)
   }
