@@ -13,16 +13,16 @@
     "test:api": "NODE_OPTIONS=\"--enable-source-maps --experimental-vm-modules\" vitest run -c vitest.api.ts"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.5",
-    "@vitest/coverage-v8": "^1.0.4",
-    "vitest": "^1.0.4"
+    "@types/jsonwebtoken": "^9.0.6",
+    "@vitest/coverage-v8": "^1.4.0",
+    "vitest": "^1.4.0"
   },
   "dependencies": {
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "destr": "^2.0.3",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.0",
     "jsonwebtoken": "^9.0.2",
-    "nitropack": "latest",
+    "nitropack": "^2.9.3",
     "set-cookie-parser": "^2.6.0"
   }
 }
