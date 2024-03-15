@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
+    "destr": "^2.0.3",
     "eslint": "^8.56.0",
     "jsonwebtoken": "^9.0.2",
     "nitropack": "latest",

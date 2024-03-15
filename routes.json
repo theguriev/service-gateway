@@ -1,0 +1,15 @@
+{
+    "/test": {
+        "method": "GET",
+        "proxy": {
+            "to": "https://example.com"
+        }
+    },
+    "/test-authorization": {
+        "method": "GET",
+        "authorizationNeeded": true,
+        "proxy": {
+            "to": "https://example.com"
+        }
+    }
+}
