@@ -38,7 +38,6 @@ export default defineNitroPlugin((app) => {
         }), method)
       }
     })
-    console.log('Nitro plugin!')
   } catch (error) {
     console.error('Initialize error: ', error)
   }
