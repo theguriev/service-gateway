@@ -2,14 +2,14 @@
     "/test": {
         "method": "GET",
         "proxy": {
-            "to": "https://example.com"
+            "to": "http://localhost:3000"
         }
     },
     "/test-authorization": {
         "method": "GET",
         "authorizationNeeded": true,
         "proxy": {
-            "to": "https://example.com"
+            "to": "http://localhost:3000"
         }
     }
 }

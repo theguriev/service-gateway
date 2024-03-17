@@ -7,14 +7,12 @@ import { listen, Listener } from 'listhen'
 import { FetchOptions, $fetch } from 'ofetch'
 import { fileURLToPath } from 'mlly'
 import { joinURL } from 'ufo'
-import { MongoMemoryServer } from 'mongodb-memory-server'
 
 interface Context {
     preset: string;
     nitro?: Nitro;
     rootDir: string;
     outDir: string;
-    mongo?: MongoMemoryServer;
     fetch: (url: string, opts?: FetchOptions) => Promise<any>;
     server?: Listener;
     env: Record<string, string>;
@@ -39,9 +37,8 @@ const ctx: Context = {
   rootDir: fixtureDir,
   outDir: resolve(fixtureDir, presetTmpDir, '.output'),
   env: {
-    NITRO_HELLO: 'world',
-    CUSTOM_HELLO_THERE: 'general',
-    SECRET: 'secret'
+    NITRO_SECRET: 'secret',
+    NITRO_ROUTES_FILE: './routes.json'
   },
   fetch: (url, opts): Promise<Response> => $fetch(joinURL(ctx.server!.url, url.slice(1)), {
     redirect: 'manual',
@@ -53,10 +50,6 @@ const ctx: Context = {
 export const setup = async () => {
   await fsp.rm(presetTmpDir, { recursive: true }).catch(() => {})
   await fsp.mkdir(presetTmpDir, { recursive: true })
-
-  const mongod = await MongoMemoryServer.create()
-  ctx.mongo = mongod
-  ctx.env.NITRO_MONGO_URI = mongod.getUri()
 
   // Set environment variables for process compatible presets
   for (const [name, value] of Object.entries(ctx.env)) {
@@ -102,9 +95,6 @@ export const teardown = async () => {
   }
   if (ctx.nitro) {
     await ctx.nitro.close()
-  }
-  if (ctx.mongo) {
-    await ctx.mongo.stop()
   }
 }
 
