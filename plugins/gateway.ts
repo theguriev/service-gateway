@@ -5,6 +5,10 @@ import type { RouterMethod } from 'h3'
 
 type Route = NitroRouteConfig & { methods: Array<RouterMethod>; authorizationNeeded?: boolean; };
 
+const prepareTarget = (target: string, params: Record<string, string>, search: string) => {
+  return `${target.replace(/\/:([^/]+)/g, (_, key) => `/${params[key] || ''}`)}${search}`
+}
+
 export default defineNitroPlugin((app) => {
   try {
     const { routesFile, secret } = useRuntimeConfig()
@@ -21,6 +25,8 @@ export default defineNitroPlugin((app) => {
           return
         }
         app.router.add(path, defineEventHandler(async (event) => {
+          const { search } = getRequestURL(event)
+          const params = getRouterParams(event)
           if (authorizationNeeded) {
             const accessToken = getCookie(event, 'accessToken')
             if (!accessToken) {
@@ -36,10 +42,10 @@ export default defineNitroPlugin((app) => {
 
           if (proxy) {
             if (typeof proxy === 'string') {
-              return proxyRequest(event, proxy)
+              return proxyRequest(event, prepareTarget(proxy, params, search))
             }
             if ('to' in proxy) {
-              return proxyRequest(event, proxy.to, proxy)
+              return proxyRequest(event, prepareTarget(proxy.to, params, search), proxy)
             }
           }
           return new Response('No proxy defined', { status: 500 })

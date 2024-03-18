@@ -11,5 +11,11 @@
         "proxy": {
             "to": "http://localhost:3000"
         }
+    },
+    "/test/:wallId/:id": {
+        "methods": ["GET"],
+        "proxy": {
+            "to": "http://localhost:3000/:wallId/:id"
+        }
     }
 }
