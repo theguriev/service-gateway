@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { safeDestr } from 'destr'
 import type { NitroRouteConfig } from 'nitropack'
-import type { H3Event, RouterMethod } from 'h3'
+import type { RouterMethod } from 'h3'
 
 type Route = NitroRouteConfig & { methods: Array<RouterMethod>; authorizationNeeded?: boolean; };
 
@@ -25,16 +25,6 @@ export default defineNitroPlugin((app) => {
           return
         }
         app.router.add(path, defineEventHandler(async (event) => {
-          const isNoCors = handleCors(event, {
-            origin: '*',
-            preflight: {
-              statusCode: 204
-            },
-            methods: '*'
-          })
-          if (!isNoCors) {
-            return
-          }
           const { search } = getRequestURL(event)
           const params = getRouterParams(event)
           if (authorizationNeeded) {
