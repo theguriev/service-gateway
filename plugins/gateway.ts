@@ -34,6 +34,7 @@ export default defineNitroPlugin((app) => {
           }
           const { search } = getRequestURL(event)
           const params = getRouterParams(event)
+          setHeader(event, 'Access-Control-Allow-Origin', '*')
           if (authorizationNeeded) {
             const accessToken = getCookie(event, 'accessToken')
             if (!accessToken) {
