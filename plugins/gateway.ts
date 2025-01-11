@@ -25,9 +25,16 @@ export default defineNitroPlugin((app) => {
           return
         }
         app.router.add(path, defineEventHandler(async (event) => {
-          setHeader(event, 'Access-Control-Allow-Origin', '*')
-          setHeader(event, 'Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT')
-          setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
+          const isNoCors = handleCors(event, {
+            origin: '*',
+            preflight: {
+              statusCode: 204
+            },
+            methods: '*'
+          })
+          if (!isNoCors) {
+            return
+          }
           const { search } = getRequestURL(event)
           const params = getRouterParams(event)
           if (authorizationNeeded) {
@@ -45,25 +52,10 @@ export default defineNitroPlugin((app) => {
 
           if (proxy) {
             if (typeof proxy === 'string') {
-              return proxyRequest(event, prepareTarget(proxy, params, search), {
-                onResponse: (event: H3Event, response: Response) => {
-                  setHeader(event, 'Access-Control-Allow-Origin', '*')
-                  setHeader(event, 'Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT')
-                  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
-                  return response
-                }
-              })
+              return proxyRequest(event, prepareTarget(proxy, params, search))
             }
             if ('to' in proxy) {
-              return proxyRequest(event, prepareTarget(proxy.to, params, search), {
-                ...proxy,
-                onResponse: (event: H3Event, response: Response) => {
-                  setHeader(event, 'Access-Control-Allow-Origin', '*')
-                  setHeader(event, 'Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT')
-                  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
-                  return response
-                }
-              })
+              return proxyRequest(event, prepareTarget(proxy.to, params, search))
             }
           }
           return new Response('No proxy defined', { status: 500 })
