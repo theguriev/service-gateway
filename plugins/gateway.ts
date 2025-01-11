@@ -25,6 +25,13 @@ export default defineNitroPlugin((app) => {
           return
         }
         app.router.add(path, defineEventHandler(async (event) => {
+          const didHandleCors = handleCors(event, {
+            origin: '*',
+            methods: '*'
+          })
+          if (didHandleCors) {
+            return
+          }
           const { search } = getRequestURL(event)
           const params = getRouterParams(event)
           if (authorizationNeeded) {
