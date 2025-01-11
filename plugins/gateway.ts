@@ -25,16 +25,11 @@ export default defineNitroPlugin((app) => {
           return
         }
         app.router.add(path, defineEventHandler(async (event) => {
-          const didHandleCors = handleCors(event, {
-            origin: '*',
-            methods: '*'
-          })
-          if (didHandleCors) {
-            return
-          }
           const { search } = getRequestURL(event)
           const params = getRouterParams(event)
           setHeader(event, 'Access-Control-Allow-Origin', '*')
+          setHeader(event, 'Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT')
+          setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
           if (authorizationNeeded) {
             const accessToken = getCookie(event, 'accessToken')
             if (!accessToken) {
