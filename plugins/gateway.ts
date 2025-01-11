@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { safeDestr } from 'destr'
 import type { NitroRouteConfig } from 'nitropack'
-import type { RouterMethod } from 'h3'
+import type { H3Event, RouterMethod } from 'h3'
 
 type Route = NitroRouteConfig & { methods: Array<RouterMethod>; authorizationNeeded?: boolean; };
 
@@ -27,9 +27,6 @@ export default defineNitroPlugin((app) => {
         app.router.add(path, defineEventHandler(async (event) => {
           const { search } = getRequestURL(event)
           const params = getRouterParams(event)
-          setHeader(event, 'Access-Control-Allow-Origin', '*')
-          setHeader(event, 'Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT')
-          setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
           if (authorizationNeeded) {
             const accessToken = getCookie(event, 'accessToken')
             if (!accessToken) {
@@ -45,10 +42,25 @@ export default defineNitroPlugin((app) => {
 
           if (proxy) {
             if (typeof proxy === 'string') {
-              return proxyRequest(event, prepareTarget(proxy, params, search))
+              return proxyRequest(event, prepareTarget(proxy, params, search), {
+                onResponse: (event: H3Event, response: Response) => {
+                  setHeader(event, 'Access-Control-Allow-Origin', '*')
+                  setHeader(event, 'Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT')
+                  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
+                  return response
+                }
+              })
             }
             if ('to' in proxy) {
-              return proxyRequest(event, prepareTarget(proxy.to, params, search), proxy)
+              return proxyRequest(event, prepareTarget(proxy.to, params, search), {
+                ...proxy,
+                onResponse: (event: H3Event, response: Response) => {
+                  setHeader(event, 'Access-Control-Allow-Origin', '*')
+                  setHeader(event, 'Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT')
+                  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
+                  return response
+                }
+              })
             }
           }
           return new Response('No proxy defined', { status: 500 })
