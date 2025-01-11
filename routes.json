@@ -1,6 +1,6 @@
 {
     "/test": {
-        "methods": ["GET"],
+        "methods": ["GET", "OPTIONS"],
         "proxy": {
             "to": "http://localhost:3000"
         }
