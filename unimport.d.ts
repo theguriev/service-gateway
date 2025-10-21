@@ -5,7 +5,7 @@ declare global {
   const beforeAll: typeof import('vitest')['beforeAll']
   const describe: typeof import('vitest')['describe']
   const expect: typeof import('vitest')['expect']
-  const issueAccessToken: typeof import('/Users/eugen/work/service-gateway/utils/issueAccessToken')['default']
+  const issueAccessToken: typeof import('/Users/gurieveugen/work/service-gateway/utils/issueAccessToken')['default']
   const it: typeof import('vitest')['it']
-  const verify: typeof import('/Users/eugen/work/service-gateway/utils/verify')['default']
+  const verify: typeof import('/Users/gurieveugen/work/service-gateway/utils/verify')['default']
 }

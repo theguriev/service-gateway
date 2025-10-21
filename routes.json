@@ -12,6 +12,26 @@
             "to": "http://localhost:3000"
         }
     },
+    "/test-rate-limit": {
+        "methods": ["GET"],
+        "rateLimit": {
+            "requests": 3,
+            "window": 10
+        },
+        "proxy": {
+            "to": "http://localhost:3000"
+        }
+    },
+    "/test-rate-limit-strict": {
+        "methods": ["GET"],
+        "rateLimit": {
+            "requests": 1,
+            "window": 1
+        },
+        "proxy": {
+            "to": "http://localhost:3000"
+        }
+    },
     "/test/:wallId/:id": {
         "methods": ["GET"],
         "proxy": {
